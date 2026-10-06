@@ -1,18 +1,19 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './Fortune.css';
 
+/* ============ SUPABASE CONFIG ============ */
+const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
+const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_KEY;
+const TABLE_NAME = 'fortune_data';
+/* ========================================= */
+
 const CONFIG = {
     MAX_NUMBER: 30,
-    BLOB_ID: '',
-    OWNER_PIN: '2204',
+    OWNER_PIN: process.env.REACT_APP_OWNER_PIN || '2204',
     POLL_MS: 8000,
 };
 
 CONFIG.MAX_NUMBER = Math.min(100, Math.max(2, +CONFIG.MAX_NUMBER || 30));
-CONFIG.BLOB_ID = CONFIG.BLOB_ID || localStorage.getItem('lb_blob') || '';
-
-const isDemo = () => !CONFIG.BLOB_ID;
-const apiUrl = () => 'https://jsonblob.com/api/jsonBlob/' + CONFIG.BLOB_ID;
 
 function norm(d) {
     if (!d || typeof d !== 'object' || Array.isArray(d)) d = {};
@@ -23,21 +24,24 @@ function norm(d) {
 }
 
 async function load() {
-    if (isDemo()) {
-        try { return norm(JSON.parse(localStorage.getItem('lb_demo') || '{}')); }
-        catch { return norm({}); }
-    }
-    const r = await fetch(apiUrl(), { cache: 'no-store' });
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.1`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    return norm(await r.json());
+    const rows = await r.json();
+    return norm(rows[0]?.data || {});
 }
 
 async function save(data) {
-    if (isDemo()) { localStorage.setItem('lb_demo', JSON.stringify(data)); return; }
-    const r = await fetch(apiUrl(), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.1`, {
+        method: 'PATCH',
+        headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ data })
     });
     if (!r.ok) throw new Error('HTTP ' + r.status);
 }
@@ -85,16 +89,13 @@ function Fortune(props) {
     const [lastSync, setLastSync] = useState(0);
     const [syncOk, setSyncOk] = useState(true);
     const [isOwner, setIsOwner] = useState(() => sessionStorage.getItem('lb_owner') === '1');
-    const [activeModal, setActiveModal] = useState(null); // 'claim' | 'taken' | 'draw' | 'pin'
+    const [activeModal, setActiveModal] = useState(null);
     const [modalCtx, setModalCtx] = useState({});
     const [toasts, setToasts] = useState([]);
 
     const [claimName, setClaimName] = useState('');
     const [pinInput, setPinInput] = useState('');
     const [maxInput, setMaxInput] = useState(CONFIG.MAX_NUMBER);
-    const [blobManual, setBlobManual] = useState('');
-    const [blobIdBoxVisible, setBlobIdBoxVisible] = useState(false);
-    const [blobIdOut, setBlobIdOut] = useState('');
 
     const [rFrom, setRFrom] = useState(1);
     const [rTo, setRTo] = useState(CONFIG.MAX_NUMBER);
@@ -175,11 +176,7 @@ function Fortune(props) {
         return new Promise((resolve) => {
             setActiveModal('pin');
             setPinInput('');
-            const checkPin = () => {
-                // будем проверять по кнопке "Войти"
-                window.__pinResolver = resolve;
-            };
-            checkPin();
+            window.__pinResolver = resolve;
         });
     };
 
@@ -234,42 +231,12 @@ function Fortune(props) {
         } catch { toast('Не удалось сохранить', 'err'); }
     };
 
-    /* ---- хранилище ---- */
-    const handleCreateBlob = async (e) => {
-        const btn = e.currentTarget;
-        btn.disabled = true;
-        btn.textContent = 'Создаём…';
-        try {
-            const r = await fetch('https://jsonblob.com/api/jsonBlob', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ entries: {}, draws: [], max: data.max })
-            });
-            const id = (r.headers.get('Location') || '').split('/').pop();
-            if (!id || id.length < 10) throw 0;
-            setBlobIdOut(id);
-            setBlobIdBoxVisible(true);
-            localStorage.setItem('lb_blob', id);
-            toast('Хранилище создано', 'ok');
-        } catch {
-            toast('Не получилось автоматически — вставьте ID вручную', 'err');
-        }
-        btn.disabled = false;
-        btn.textContent = 'Создать хранилище';
-    };
-
-    const handleApplyId = () => {
-        const v = blobManual.trim();
-        if (!v) return;
-        localStorage.setItem('lb_blob', v);
-        window.location.reload();
-    };
-
     const handleReset = async () => {
         if (!window.confirm('Освободить ВСЕ номера? Действие необратимо.')) return;
         try {
             const fresh = await load();
             fresh.entries = {};
+            fresh.draws = [];
             await save(fresh);
             setData(fresh);
             setLastSync(Date.now());
@@ -374,9 +341,17 @@ function Fortune(props) {
         const from = parseInt(rFrom, 10);
         const to = parseInt(rTo, 10);
         if (!(from >= 1 && to <= data.max && from <= to)) return toast('Укажите корректный диапазон', 'warn');
-        const pool = [];
-        for (let n = from; n <= to; n++) if (data.entries[n]) pool.push(n);
+
+        const wonBefore = new Set((data.draws || []).map(x => x.n));
+        let pool = [];
+        for (let n = from; n <= to; n++) {
+            if (data.entries[n] && !wonBefore.has(n)) pool.push(n);
+        }
+        if (!pool.length) {
+            for (let n = from; n <= to; n++) if (data.entries[n]) pool.push(n);
+        }
         if (!pool.length) return toast('В этом диапазоне нет занятых номеров', 'warn');
+
         const final = pool[(Math.random() * pool.length) | 0];
         setWinner(null);
         await spin(pool, final);
@@ -384,7 +359,7 @@ function Fortune(props) {
         runConfetti(200, canvasRef);
 
         const fresh = { ...data };
-        fresh.draws = fresh.draws || [];
+        fresh.draws = [...(fresh.draws || [])];
         fresh.draws.push({ ts: Date.now(), from, to, n: final, name: data.entries[final].name });
         try { await save(fresh); } catch { }
         setData(fresh);
@@ -478,7 +453,6 @@ function Fortune(props) {
                         <div className="sync">
                             <span className={`dot ${syncOk ? 'on' : 'off'}`}></span>
                             <span>обновлено <b>{ago}</b></span>
-                            {isDemo() && <span className="chip-demo">демо-режим</span>}
                         </div>
                     </div>
                     <div className="status__actions">
@@ -505,27 +479,7 @@ function Fortune(props) {
                         </div>
                         <div>
                             <span className="owner__label">Хранилище</span>
-                            <p className="hint">
-                                {isDemo()
-                                    ? 'Не подключено: сайт в демо-режиме, записи видны только в этом браузере.'
-                                    : `Подключено. ID: ${CONFIG.BLOB_ID}`}
-                            </p>
-                            <div className="row">
-                                <button className="btn btn--gold" onClick={handleCreateBlob}>Создать хранилище</button>
-                            </div>
-                            {blobIdBoxVisible && (
-                                <>
-                                    <div className="blobid">{blobIdOut}</div>
-                                    <p className="hint">
-                                        Вставьте этот ID в <code>CONFIG.BLOB_ID</code> в файле Fortune.js и пересоберите — иначе у других участников будет свой список.
-                                    </p>
-                                </>
-                            )}
-                            <div className="row">
-                                <input className="inp" placeholder="или вставьте готовый ID"
-                                    value={blobManual} onChange={(e) => setBlobManual(e.target.value)} />
-                                <button className="btn" onClick={handleApplyId}>Подключить</button>
-                            </div>
+                            <p className="hint">Подключено: Supabase. Данные общие для всех участников.</p>
                         </div>
                         <div>
                             <span className="owner__label">Опасная зона</span>
