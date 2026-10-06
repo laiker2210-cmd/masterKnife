@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './Nav.css';
 
 function Nav(props) {
-    const { links, onContact } = props;
+    const { links, onContact, onFortune } = props;
     const [isOpen, setIsOpen] = useState(false);
 
     const closeMenu = () => setIsOpen(false);
@@ -29,7 +29,17 @@ function Nav(props) {
                     ))}
                 </ul>
 
-                <button className="nav-svaz" onClick={onContact}>Связаться</button>
+                <div className="nav__actions">
+                    <button
+                        className="nav__fortune"
+                        onClick={() => { onFortune(); closeMenu(); }}
+                        aria-label="Колесо Фортуны"
+                        title="Колесо Фортуны"
+                    >
+                        🎰
+                    </button>
+                    <button className="nav-svaz" onClick={onContact}>Связаться</button>
+                </div>
             </div>
         </nav>
     );

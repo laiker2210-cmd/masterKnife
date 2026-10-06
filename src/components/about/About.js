@@ -8,7 +8,7 @@ function About() {
 
                 <div className="about__block about__block--left">
                     <img
-                        src="/images/about/forge.jpg"
+                        src={process.env.PUBLIC_URL + "/images/about/forge.jpg"} 
                         alt="Нож на подставке"
                         className="about__image"
                     />
@@ -22,7 +22,7 @@ function About() {
 
                 <div className="about__block about__block--right">
                     <img
-                        src="/images/about/forge3.jpg"
+                        src={process.env.PUBLIC_URL + "/images/about/forge3.jpg"}
                         alt="Нож на подставке"
                         className="about__image"
                     />
