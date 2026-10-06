@@ -1,0 +1,70 @@
+.knife-card {
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.knife-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.knife-card__image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+
+.knife-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    flex-grow: 1;
+}
+
+.knife-card__name {
+    margin: 0;
+}
+
+.knife-card__short {
+    margin: 0;
+    color: #666666;
+    font-size: 14px;
+}
+
+/*цену и статус к низу карточки */
+.knife-card__footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.knife-card__price {
+    font-weight: bold;
+}
+
+.knife-card__status {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: #e6f4ea;
+    color: #1e7e34;
+}
+
+.knife-card__status--sold {
+    background: #fdecea;
+    color: #b3261e;
+}
+
+.knife-card__status--order {
+    background: #fef7e0;
+    color: #9a6700;
+}

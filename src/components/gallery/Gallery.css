@@ -1,0 +1,114 @@
+.gallery {
+    background: #ffffff;
+    padding: 60px 0;
+}
+
+.gallery__title {
+    margin: 0 0 8px;
+    text-align: center;
+    font-size: clamp(24px, 4vw, 36px);
+}
+
+.gallery__subtitle {
+    margin: 0 0 40px;
+    text-align: center;
+    color: #666666;
+}
+
+/* ===== десктоп: сетка 3 колонки ===== */
+.gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.gallery__item {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.gallery__item img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.gallery__item:hover img {
+    transform: scale(1.05);
+}
+
+/* фото в лайтбоксе */
+.gallery__full {
+    display: block;
+    width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* стрелки на десктопе не нужны */
+.gallery__controls {
+    display: none;
+}
+
+/* ===== планшет: 2 колонки ===== */
+@media (max-width: 900px) {
+    .gallery__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ===== телефон: лента в высоту экрана ===== */
+@media (max-width: 600px) {
+    .gallery__grid {
+        grid-template-columns: none;
+
+        grid-template-rows: calc(100vh - 300px);
+        grid-template-rows: calc(100svh - 300px);
+
+        grid-auto-flow: column;
+        grid-auto-columns: 90%;
+
+        gap: 16px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+
+    .gallery__grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .gallery__item {
+        scroll-snap-align: start;
+    }
+
+    /*заполняем по высоте */
+    .gallery__item img {
+        aspect-ratio: auto;
+        height: 100%;
+    }
+
+    .gallery__controls {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .gallery__arrow {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid #cccccc;
+        background: #ffffff;
+        font-size: 18px;
+        cursor: pointer;
+    }
+}

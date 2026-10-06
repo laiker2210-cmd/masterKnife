@@ -1,0 +1,73 @@
+.contacts {
+    background: #ffffff;
+    padding: 60px 0;
+    text-align: center;
+}
+
+.contacts__title {
+    margin: 0 0 8px;
+    font-size: clamp(24px, 4vw, 36px);
+}
+
+.contacts__subtitle {
+    margin: 0 0 40px;
+    color: #666666;
+}
+
+.contacts__phone {
+    display: inline-block;
+    margin-bottom: 24px;
+    font-size: clamp(24px, 5vw, 40px);
+    font-weight: bold;
+    color: #000000;
+    text-decoration: none;
+}
+
+.contacts__messengers {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.contacts__btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: opacity 0.2s;
+}
+
+.contacts__btn:hover {
+    opacity: 0.85;
+}
+
+.contacts__btn--wa {
+    background: #25d366;
+}
+
+.contacts__btn--vk {
+    background: #0077ff;
+}
+
+.contacts__btn--max {
+    background: #5d5fef;
+}
+
+.contacts__cta {
+    font: inherit;
+    font-weight: bold;
+    padding: 14px 32px;
+    border: none;
+    border-radius: 8px;
+    background: #000000;
+    color: #ffffff;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.contacts__cta:hover {
+    opacity: 0.8;
+}

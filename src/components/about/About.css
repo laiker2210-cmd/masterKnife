@@ -1,0 +1,61 @@
+.about {
+    background: #000000;
+    color: #ffffff;
+    padding: 60px 0;
+}
+
+.about__title {
+    text-align: center;
+    margin: 0 0 40px;
+    font-size: clamp(24px, 4vw, 36px);
+}
+
+.about__block {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.about__block:last-child {
+    margin-bottom: 0;
+}
+
+/*картинка слева, текст справа */
+.about__block--left {
+    flex-direction: row;
+}
+
+/*текст слева, картинка справа */
+.about__block--right {
+    flex-direction: row-reverse;
+}
+
+.about__image {
+    width: 45%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.about__block p {
+    flex: 1;
+    margin: 0;
+    line-height: 1.8;
+    font-size: clamp(16px, 2vw, 18px);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* на мобильных - колонкой, картинка сверху */
+@media (max-width: 768px) {
+
+    .about__block,
+    .about__block--left,
+    .about__block--right {
+        flex-direction: column;
+    }
+
+    .about__image {
+        width: 100%;
+    }
+}

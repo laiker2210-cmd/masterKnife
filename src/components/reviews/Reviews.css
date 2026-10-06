@@ -1,0 +1,118 @@
+.reviews {
+    background: #000000;
+    color: #ffffff;
+    padding: 60px 0;
+}
+
+.reviews__title {
+    margin: 0 0 40px;
+    text-align: center;
+    font-size: clamp(24px, 4vw, 36px);
+}
+
+/* ===== десктоп: сетка 3 колонки ===== */
+.reviews__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.review-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #1a1a1a;
+    border: 1px solid #333333;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.review-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.review-card__author {
+    font-weight: bold;
+}
+
+.review-card__date {
+    color: #888888;
+    font-size: 13px;
+}
+
+.review-card__stars {
+    color: #f5b301;
+    letter-spacing: 2px;
+}
+
+.review-card__knife {
+    margin: 0;
+    color: #9a9a9a;
+    font-size: 14px;
+}
+
+.review-card__text {
+    margin: 0;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/*стрелки на пк и ноутах не нужны */
+.reviews__controls {
+    display: none;
+}
+
+/* ===== планшет: 2 колонки ===== */
+@media (max-width: 900px) {
+    .reviews__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ========= телефон: лента в высоту экрана ========= */
+@media (max-width: 600px) {
+    .reviews__grid {
+        grid-template-columns: none;
+
+        grid-template-rows: calc(100vh - 260px);
+        grid-template-rows: calc(100svh - 260px);
+
+        grid-auto-flow: column;
+        grid-auto-columns: 90%;
+
+        gap: 16px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+
+    .reviews__grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .review-card {
+        scroll-snap-align: start;
+        overflow-y: auto;
+    }
+
+    .reviews__controls {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .reviews__arrow {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid #444444;
+        background: transparent;
+        color: #ffffff;
+        font-size: 18px;
+        cursor: pointer;
+    }
+}

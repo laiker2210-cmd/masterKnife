@@ -1,0 +1,62 @@
+.contact-modal__title {
+    margin: 0 0 8px;
+    text-align: center;
+}
+
+.contact-modal__hint {
+    margin: 0 0 16px;
+    text-align: center;
+    color: #666666;
+    font-size: 14px;
+}
+
+.contact-modal__phone {
+    display: block;
+    margin: 16px 0 4px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #000000;
+    text-decoration: none;
+}
+
+.contact-modal__note {
+    margin: 0 0 16px;
+    text-align: center;
+    color: #666666;
+    font-size: 14px;
+}
+
+.contact-modal__links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.contact-modal__btn {
+    padding: 12px;
+    text-align: center;
+    border-radius: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: opacity 0.2s;
+}
+
+.contact-modal__btn:hover {
+    opacity: 0.85;
+}
+
+.contact-modal__btn--wa {
+    background: #25d366;
+}
+
+.contact-modal__btn--vk {
+    background: #0077ff;
+}
+
+.contact-modal__btn--max {
+    background: #5d5fef;
+}
+
+/* подберите под фирменный цвет MAX */
