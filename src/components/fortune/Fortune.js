@@ -260,7 +260,7 @@ function Fortune(props) {
     const handleClaimSubmit = async (e) => {
         e.preventDefault();
         const name = claimName.trim().replace(/\s+/g, ' ');
-        if (!/^[а-яёa-z'’.\-]{3,60}$/i.test(name)) return toast('Введите ФИО полностью', 'warn');
+        if (!/^[а-яёa-z'’.-]{3,60}$/i.test(name)) return toast('Введите ФИО полностью', 'warn');
         try {
             const fresh = await load();
             if (fresh.entries[modalCtx.n]) {

@@ -56,6 +56,7 @@ function MainLayout() {
                 <Gallery images={content.gallery} />
                 <Gallery images={content.gallery} />
                 <Reviews reviews={content.reviews} />
+                <Contacts onContact={openContact} />
             </main>
             <Footer />
 
