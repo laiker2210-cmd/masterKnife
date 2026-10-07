@@ -1,8 +1,9 @@
 import { useRef } from 'react';
-import { reviews } from '../../data/reviews';
+import { reviews as localReviews } from '../../data/reviews';
 import './Reviews.css';
 
-function Reviews() {
+function Reviews(props) {
+    const list = props.reviews?.length ? props.reviews : localReviews;
     const gridRef = useRef(null);
 
     const scroll = (direction) => {
@@ -17,7 +18,7 @@ function Reviews() {
                 <h2 className="reviews__title">Отзывы</h2>
 
                 <div className="reviews__grid" ref={gridRef}>
-                    {reviews.map(review => (
+                    {list.map(review => (
                         <article key={review.id} className="review-card">
                             <div className="review-card__header">
                                 <span className="review-card__author">{review.author}</span>
@@ -25,7 +26,7 @@ function Reviews() {
                             </div>
 
                             <span className="review-card__stars" aria-label={`Оценка ${review.rating} из 5`}>
-                                {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                                {'★'.repeat(Number(review.rating) || 5)}{'☆'.repeat(5 - (Number(review.rating) || 5))}
                             </span>
 
                             <p className="review-card__knife">{review.knife}</p>

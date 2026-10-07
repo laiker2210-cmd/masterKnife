@@ -46,6 +46,7 @@
     flex-direction: column;
     gap: 8px;
     font-size: 14px;
+    color: #000000;
 }
 
 .knife-modal__specs li span {

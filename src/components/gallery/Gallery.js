@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import Modal from '../modal/Modal';
-import { galleryImages } from '../../data/gallery';
+import { galleryImages as localImages } from '../../data/gallery';
 import './Gallery.css';
 
-function Gallery() {
+function Gallery(props) {
+    const images = props.images?.length ? props.images : localImages;
     const [selected, setSelected] = useState(null);
     const gridRef = useRef(null);
 
@@ -20,7 +21,7 @@ function Gallery() {
                 <p className="gallery__subtitle">Процесс работы и крупные планы</p>
 
                 <div className="gallery__grid" ref={gridRef}>
-                    {galleryImages.map(img => (
+                    {images.map(img => (
                         <button
                             key={img.id}
                             className="gallery__item"
