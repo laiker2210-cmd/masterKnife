@@ -8,12 +8,10 @@ const TABLE_NAME = 'fortune_data';
 /* ========================================= */
 
 const CONFIG = {
-    MAX_NUMBER: 30,
+    MAX_NUMBER: Math.min(100, Math.max(2, 30)),
     OWNER_PIN: process.env.REACT_APP_OWNER_PIN || '2204',
     POLL_MS: 8000,
 };
-
-CONFIG.MAX_NUMBER = Math.min(100, Math.max(2, +CONFIG.MAX_NUMBER || 30));
 
 function norm(d) {
     if (!d || typeof d !== 'object' || Array.isArray(d)) d = {};
@@ -158,9 +156,26 @@ function Fortune(props) {
         return () => cancelAnimationFrame(raf);
     }, []);
 
+    /* ---- отмена PIN: резолвим promise, иначе кнопка розыгрыша «виснет» ---- */
+    const cancelPin = useCallback(() => {
+        if (window.__pinResolver) {
+            window.__pinResolver(false);
+            window.__pinResolver = null;
+        }
+        setActiveModal(null);
+    }, []);
+
     /* ---- клавиша Escape ---- */
     useEffect(() => {
-        const onKey = (e) => { if (e.key === 'Escape') setActiveModal(null); };
+        const onKey = (e) => {
+            if (e.key === 'Escape') {
+                if (window.__pinResolver) {
+                    window.__pinResolver(false);
+                    window.__pinResolver = null;
+                }
+                setActiveModal(null);
+            }
+        };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
     }, []);
@@ -355,15 +370,28 @@ function Fortune(props) {
         const final = pool[(Math.random() * pool.length) | 0];
         setWinner(null);
         await spin(pool, final);
-        setWinner({ n: final, name: data.entries[final].name });
+
+        const winnerName = data.entries[final]?.name || '—';
+        setWinner({ n: final, name: winnerName });
         runConfetti(200, canvasRef);
 
-        const fresh = { ...data };
-        fresh.draws = [...(fresh.draws || [])];
-        fresh.draws.push({ ts: Date.now(), from, to, n: final, name: data.entries[final].name });
-        try { await save(fresh); } catch { }
-        setData(fresh);
-        setLastSync(Date.now());
+        // FIX: свежий снимок из базы — заявки, пришедшие во время крутки, не затираются
+        try {
+            const fresh = await load();
+            fresh.draws = [...(fresh.draws || [])];
+            fresh.draws.push({
+                ts: Date.now(),
+                from,
+                to,
+                n: final,
+                name: fresh.entries[final]?.name || winnerName,
+            });
+            await save(fresh);
+            setData(fresh);
+            setLastSync(Date.now());
+        } catch {
+            toast('Победитель определён, но запись в базу не сохранилась', 'err');
+        }
     };
 
     /* ---- пресеты розыгрыша ---- */
@@ -643,7 +671,7 @@ function Fortune(props) {
 
             {/* ---- Модалка: пароль ---- */}
             {activeModal === 'pin' && (
-                <div className="overlay on" onClick={(e) => { if (e.target === e.currentTarget) setActiveModal(null); }}>
+                <div className="overlay on" onClick={(e) => { if (e.target === e.currentTarget) cancelPin(); }}>
                     <div className="modal" style={{ width: 'min(320px, 94vw)' }}>
                         <div className="modal__kicker">доступ ведущего</div>
                         <h2 className="modal__title" style={{ fontSize: 19 }}>Пароль</h2>
@@ -654,6 +682,7 @@ function Fortune(props) {
                             autoFocus />
                         <div className="modal__row">
                             <button className="btn btn--gold" onClick={handlePinOk}>Войти</button>
+                            <button className="btn" onClick={cancelPin}>Отмена</button>
                         </div>
                     </div>
                 </div>

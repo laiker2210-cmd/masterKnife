@@ -9,7 +9,7 @@ export const collections = {
             { key: 'name', label: 'Название', type: 'text' },
             { key: 'status', label: 'Статус', type: 'text' },
             { key: 'price', label: 'Цена', type: 'text' },
-            { key: 'image', label: 'Ссылка на фото', type: 'text' },
+            { key: 'image', label: 'Фото', type: 'image' },  // ← было 'text'
             { key: 'short', label: 'Короткое описание (в карточке)', type: 'textarea' },
             { key: 'specs', label: 'Характеристики (по одной на строку, «Параметр: значение»)', type: 'pairs' },
             { key: 'description', label: 'Полное описание', type: 'textarea' },
@@ -32,7 +32,7 @@ export const collections = {
         preview: (i) => i.alt || i.src,
         blank: () => ({ id: Date.now(), src: '', alt: '' }),
         fields: [
-            { key: 'src', label: 'Ссылка на фото', type: 'text' },
+            { key: 'src', label: 'Фото', type: 'image' },  // ← было 'text'
             { key: 'alt', label: 'Подпись (alt)', type: 'text' },
         ],
     },

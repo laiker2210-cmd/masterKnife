@@ -1,20 +1,35 @@
 //обёртка с проверкой авторизации
 
+import { useEffect, useState } from 'react';
 import { Outlet, Navigate, Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../../lib/supabaseClient';
 import './Admin.css';
 
 function AdminLayout() {
     const navigate = useNavigate();
-    const isAuth = sessionStorage.getItem('admin_auth') === '1';
+    const [loading, setLoading] = useState(true);
+    const [isAuth, setIsAuth] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            setIsAuth(!!session);
+            setLoading(false);
+        })();
+    }, []);
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        navigate('/');
+    };
+
+    if (loading) {
+        return <div className="admin-loading">Загрузка...</div>;
+    }
 
     if (!isAuth) {
         return <Navigate to="/admin/login" replace />;
     }
-
-    const handleLogout = () => {
-        sessionStorage.removeItem('admin_auth');
-        navigate('/');
-    };
 
     return (
         <div className="admin-layout">

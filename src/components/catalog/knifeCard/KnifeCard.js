@@ -1,4 +1,5 @@
 import './KnifeCard.css';
+import { resolveImage } from '../../../lib/resolveImage';
 
 //соответствие статуса и цвета беджа
 const statusClass = {
@@ -14,7 +15,7 @@ function KnifeCard(props) {
         <article className="knife-card" onClick={onSelect}>
             <img
                 className="knife-card__image"
-                src={knife.image}
+                src={resolveImage(knife.image)}
                 alt={`Нож «${knife.name}»`}
             />
             <div className="knife-card__body">

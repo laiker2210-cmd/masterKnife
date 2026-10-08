@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import Modal from '../modal/Modal';
+import { resolveImage } from '../../lib/resolveImage';
 import { galleryImages as localImages } from '../../data/gallery';
 import './Gallery.css';
 
@@ -28,7 +29,7 @@ function Gallery(props) {
                             onClick={() => setSelected(img)}
                             aria-label={`Открыть фото: ${img.alt}`}
                         >
-                            <img src={img.src} alt={img.alt} loading="lazy" />
+                            <img src={resolveImage(img.src)} alt={img.alt} loading="lazy" />
                         </button>
                     ))}
                 </div>

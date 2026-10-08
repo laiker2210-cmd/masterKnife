@@ -1,26 +1,19 @@
-//общий доступ к данным
-
-const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
-const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_KEY;
-const TABLE = 'site_content';
-
-const headers = {
-    'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${SUPABASE_KEY}`,
-};
+import { supabase } from './supabaseClient';
 
 export async function loadContent() {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.1`, { headers });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const rows = await r.json();
-    return rows[0]?.data || null;
+    const { data, error } = await supabase
+        .from('site_content')
+        .select('data')
+        .eq('id', 1)
+        .maybeSingle();
+    if (error) throw error;
+    return data?.data || null;
 }
 
-export async function saveContent(data) {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.1`, {
-        method: 'PATCH',
-        headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ data }),
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
+export async function saveContent(content) {
+    const { error } = await supabase
+        .from('site_content')
+        .update({ data: content, updated_at: new Date().toISOString() })
+        .eq('id', 1);
+    if (error) throw error;
 }

@@ -1,5 +1,6 @@
 
 import Modal from '../../modal/Modal';
+import { resolveImage } from '../../../lib/resolveImage';
 import './KnifeModal.css';
 
 function KnifeModal(props) {
@@ -12,7 +13,7 @@ function KnifeModal(props) {
 
     return (
         <Modal onClose={onClose}>
-            <img className="knife-modal__image" src={knife.image} alt={`Нож «${knife.name}»`} />
+            <img className="knife-modal__image" src={resolveImage(knife.image)} alt={`Нож «${knife.name}»`} />
             <h2 className="knife-modal__name">{knife.name}</h2>
             <p className="knife-modal__meta">{knife.status} · {knife.price}</p>
 

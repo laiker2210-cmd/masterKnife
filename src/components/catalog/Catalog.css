@@ -63,3 +63,11 @@
 .catalog__arrow:hover {
     background: #eeeeee;
 }
+
+.catalog__image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: contain;
+    background: #f7f7f7;
+    display: block;
+}

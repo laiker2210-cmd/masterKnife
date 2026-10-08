@@ -1,6 +1,7 @@
 //универсальная форма
 
 import { useState } from 'react';
+import ImageUploader from './ImageUploader';
 import './Admin.css';
 
 const specsToText = (specs) =>
@@ -67,6 +68,12 @@ function CollectionEditor(props) {
                             <textarea rows={6} value={draft.specsText ?? ''}
                                 onChange={e => setField('specsText', e.target.value)}
                                 placeholder={'Сталь: Х12МФ\nДлина клинка: 145 мм'} />
+                        )}
+                        {f.type === 'image' && (
+                            <ImageUploader
+                                value={draft[f.key] ?? ''}
+                                onChange={(url) => setField(f.key, url)}
+                            />
                         )}
                     </label>
                 ))}

@@ -18,32 +18,32 @@ function Catalog(props) {
     return (
         <section className="catalog " id="catalog">
             <div className="catalog_cont container">
-<h2 className="catalog__title">Наши ножи</h2>
+                <h2 className="catalog__title">Наши ножи</h2>
 
-            <div className="catalog__track" ref={trackRef}>
-                {knives.map(knife => (
-                    <KnifeCard
-                        key={knife.id}
-                        knife={knife}
-                        onSelect={() => setSelectedKnife(knife)}
+                <div className="catalog__track" ref={trackRef}>
+                    {knives.map(knife => (
+                        <KnifeCard
+                            key={knife.id}
+                            knife={knife}
+                            onSelect={() => setSelectedKnife(knife)}
+                        />
+                    ))}
+                </div>
+
+                <div className="catalog__controls">
+                    <button className="catalog__arrow" onClick={() => scroll(-1)} aria-label="Предыдущие ножи">←</button>
+                    <button className="catalog__arrow" onClick={() => scroll(1)} aria-label="Следующие ножи">→</button>
+                </div>
+
+                {selectedKnife && (
+                    <KnifeModal
+                        knife={selectedKnife}
+                        onClose={() => setSelectedKnife(null)}
+                        onContact={onContact}
                     />
-                ))}
+                )}
             </div>
 
-            <div className="catalog__controls">
-                <button className="catalog__arrow" onClick={() => scroll(-1)} aria-label="Предыдущие ножи">←</button>
-                <button className="catalog__arrow" onClick={() => scroll(1)} aria-label="Следующие ножи">→</button>
-            </div>
-
-            {selectedKnife && (
-                <KnifeModal
-                    knife={selectedKnife}
-                    onClose={() => setSelectedKnife(null)}
-                    onContact={onContact}
-                />
-            )}
-            </div>
-            
         </section>
     );
 }
