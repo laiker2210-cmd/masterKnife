@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/masterKnife/static/css/main.b89dce18.css",
+    "main.css": "/masterKnife/static/css/main.4e306fcc.css",
     "main.js": "/masterKnife/static/js/main.fd3efb29.js",
     "static/media/headerImg.jpeg": "/masterKnife/static/media/headerImg.3863b799fdabf2fb971d.jpeg",
     "index.html": "/masterKnife/index.html",
-    "main.b89dce18.css.map": "/masterKnife/static/css/main.b89dce18.css.map",
+    "main.4e306fcc.css.map": "/masterKnife/static/css/main.4e306fcc.css.map",
     "main.fd3efb29.js.map": "/masterKnife/static/js/main.fd3efb29.js.map"
   },
   "entrypoints": [
-    "static/css/main.b89dce18.css",
+    "static/css/main.4e306fcc.css",
     "static/js/main.fd3efb29.js"
   ]
 }
