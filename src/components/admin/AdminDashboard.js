@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import CollectionEditor from './CollectionEditor';
 import { collections } from './schemas';
-import { loadContent, saveContent } from '../../lib/contentApi';
+import { loadContent, saveContent, loadFortune  } from '../../lib/contentApi';
 import { knives } from '../../data/knives';
 import { reviews } from '../../data/reviews';
 import { galleryImages } from '../../data/gallery';
 import './Admin.css';
 
 const localContent = { knives, reviews, gallery: galleryImages };
+
+
 
 function AdminDashboard() {
     const [content, setContent] = useState(localContent);
@@ -52,6 +54,25 @@ function AdminDashboard() {
         }
     };
 
+    const handleBackup = async () => {
+    try {
+        const backup = {
+            ts: new Date().toISOString(),
+            content: contentRef.current,
+            fortune: await loadFortune(),
+        };
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `masterknife-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        setStatus('Резервная копия скачана ✓');
+    } catch {
+        setStatus('Не удалось создать резервную копию ✗');
+    }
+};
+
     return (
         <div>
             <div className="admin-tabs">
@@ -60,6 +81,7 @@ function AdminDashboard() {
                         {s.title}
                     </button>
                 ))}
+                <button className="btn" onClick={handleBackup} style={{ marginLeft: 'auto' }}>💾 Резервная копия</button>
             </div>
             <p className="admin-status">{status}</p>
             {loading ? (

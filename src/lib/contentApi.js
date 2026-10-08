@@ -17,3 +17,13 @@ export async function saveContent(content) {
         .eq('id', 1);
     if (error) throw error;
 }
+
+export async function loadFortune() {
+    const { data, error } = await supabase
+        .from('fortune_data')
+        .select('data')
+        .eq('id', 1)
+        .maybeSingle();
+    if (error) throw error;
+    return data?.data || null;
+}

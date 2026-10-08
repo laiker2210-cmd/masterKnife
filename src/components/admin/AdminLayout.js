@@ -1,5 +1,3 @@
-//обёртка с проверкой авторизации
-
 import { useEffect, useState } from 'react';
 import { Outlet, Navigate, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
@@ -11,11 +9,19 @@ function AdminLayout() {
     const [isAuth, setIsAuth] = useState(false);
 
     useEffect(() => {
+        let alive = true;
         (async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setIsAuth(!!session);
-            setLoading(false);
+            try {
+                const { data } = await supabase.auth.getSession();
+                if (alive) setIsAuth(!!data.session);
+            } catch {
+                // сеть отвалилась — не зависаем, показываем форму входа
+                if (alive) setIsAuth(false);
+            } finally {
+                if (alive) setLoading(false);   // выполняется ВСЕГДА
+            }
         })();
+        return () => { alive = false; };
     }, []);
 
     const handleLogout = async () => {

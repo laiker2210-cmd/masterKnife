@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { uploadImage } from '../../lib/storageApi';
+import { uploadImage, deleteImage } from '../../lib/storageApi';
 import './Admin.css';
 
 function ImageUploader(props) {
@@ -14,18 +14,17 @@ function ImageUploader(props) {
         setError('');
         try {
             const url = await uploadImage(file);
+            // удаляем старый файл из Storage, если он там был
+            if (value && value.includes('/storage/v1/object/public/images/')) {
+                const oldName = decodeURIComponent(value.split('/images/').pop());
+                deleteImage(oldName).catch(() => {});
+            }
             onChange(url);
         } catch {
             setError('Ошибка загрузки');
         } finally {
             setUploading(false);
         }
-    };
-
-    const extractPath = (url) => {
-        if (!url) return '';
-        const match = url.match(/\/images\/(.+)$/);
-        return match ? match[1] : '';
     };
 
     return (
@@ -40,15 +39,13 @@ function ImageUploader(props) {
                     {uploading ? 'Загрузка...' : '📷 Загрузить фото'}
                     <input type="file" accept="image/*" onChange={handleFile} hidden />
                 </label>
-                {value && (
-                    <input
-                        type="text"
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        placeholder="Или вставьте ссылку"
-                        className="image-uploader__url"
-                    />
-                )}
+                <input
+                    type="text"
+                    value={value || ''}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder="Или вставьте ссылку"
+                    className="image-uploader__url"
+                />
             </div>
             {error && <p className="image-uploader__error">{error}</p>}
         </div>

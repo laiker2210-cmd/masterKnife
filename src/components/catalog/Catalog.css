@@ -71,3 +71,9 @@
     background: #f7f7f7;
     display: block;
 }
+
+@media (max-width: 600px) {
+    .catalog__controls {
+        display: none;
+    }
+}
