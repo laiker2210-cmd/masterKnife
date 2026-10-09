@@ -9,6 +9,7 @@ import Contacts from '../contacts/Contacts';
 import Footer from '../footer/Footer';
 import ContactModal from '../contactModal/ContactModal';
 import Fortune from '../fortune/Fortune';
+import ScrollTop from '../scrolltop/ScrollTop';
 import { NavLinks } from '../../data/NavLinks';
 import { knives as localKnives } from '../../data/knives';
 import { reviews as localReviews } from '../../data/reviews';
@@ -98,6 +99,7 @@ function MainLayout() {
                 <Contacts onContact={openContact} />
             </main>
             <Footer />
+            <ScrollTop/>
 
             {contactOpen && (
                 <ContactModal knife={contactKnife} onClose={() => setContactOpen(false)} />

@@ -8,6 +8,9 @@ function Hero() {
                 <img src={logo} className="App-logo" alt="Нож ручной работы" />
                 <h1>Мастерская Тайга:<br />ножи ручной работы</h1>
             </div>
+            <div className="dev-watermark" aria-hidden="true">
+                <span>САЙТ В РАЗРАБОТКЕ</span>
+            </div>
         </section>
     );
 }

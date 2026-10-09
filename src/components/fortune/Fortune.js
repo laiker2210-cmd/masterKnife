@@ -9,7 +9,7 @@ const TABLE_NAME = 'fortune_data';
 
 const CONFIG = {
     MAX_NUMBER: Math.min(100, Math.max(2, 30)),
-    OWNER_PIN: process.env.REACT_APP_OWNER_PIN || '2204',
+    OWNER_PIN: process.env.REACT_APP_OWNER_PIN,
     POLL_MS: 8000,
 };
 
@@ -274,8 +274,11 @@ function Fortune(props) {
 
     const handleClaimSubmit = async (e) => {
         e.preventDefault();
-        const name = claimName.trim().replace(/\s+/g, ' ');
-        if (!/^[а-яёa-z'’.-]{3,60}$/i.test(name)) return toast('Введите ФИО полностью', 'warn');
+        const clean = claimName.trim().replace(/\s+/g, ' ');
+        if (!/^[а-яёa-z'’.\- ]{3,60}$/i.test(clean) || !/[а-яёa-z]/i.test(clean)) {
+            return toast('Введите имя полностью', 'warn');
+        }
+        const name = clean;
         try {
             const fresh = await load();
             if (fresh.entries[modalCtx.n]) {
@@ -375,7 +378,7 @@ function Fortune(props) {
         setWinner({ n: final, name: winnerName });
         runConfetti(200, canvasRef);
 
-        // FIX: свежий снимок из базы — заявки, пришедшие во время крутки, не затираются
+        // FIX: свежий снимок из базы - заявки, пришедшие во время крутки, не затираются
         try {
             const fresh = await load();
             fresh.draws = [...(fresh.draws || [])];
@@ -459,7 +462,7 @@ function Fortune(props) {
                         <p className="sub">Номера от 1 до {data.max}</p>
                         <div className="steps">
                             <span className="step"><b>1</b> выбери свободный номер</span>
-                            <span className="step"><b>2</b> впиши ФИО</span>
+                            <span className="step"><b>2</b> впиши имя</span>
                             <span className="step"><b>3</b> жди розыгрыша</span>
                         </div>
                     </div>
@@ -468,8 +471,8 @@ function Fortune(props) {
 
             <div className="ticker">
                 <div className="ticker__row">
-                    <span>ВЫБЕРИ НОМЕР&nbsp;&nbsp;★&nbsp;&nbsp;ВПИШИ ФИО&nbsp;&nbsp;★&nbsp;&nbsp;КРУТИ БАРАБАН&nbsp;&nbsp;★&nbsp;&nbsp;ЖДИ РОЗЫГРЫША&nbsp;&nbsp;★&nbsp;&nbsp;ЯКУБОВИЧ ЖЕЛАЕТ УДАЧИ&nbsp;&nbsp;★&nbsp;&nbsp;</span>
-                    <span aria-hidden="true">ВЫБЕРИ НОМЕР&nbsp;&nbsp;★&nbsp;&nbsp;ВПИШИ ФИО&nbsp;&nbsp;★&nbsp;&nbsp;КРУТИ БАРАБАН&nbsp;&nbsp;★&nbsp;&nbsp;ЖДИ РОЗЫГРЫША&nbsp;&nbsp;★&nbsp;&nbsp;ЯКУБОВИЧ ЖЕЛАЕТ УДАЧИ&nbsp;&nbsp;★&nbsp;&nbsp;</span>
+                    <span>ВЫБЕРИ НОМЕР&nbsp;&nbsp;★&nbsp;&nbsp;ВПИШИ ИМЯ&nbsp;&nbsp;★&nbsp;&nbsp;КРУТИ БАРАБАН&nbsp;&nbsp;★&nbsp;&nbsp;ЖДИ РОЗЫГРЫША&nbsp;&nbsp;★&nbsp;&nbsp;УСАТЫЙ ЖЕЛАЕТ УДАЧИ&nbsp;&nbsp;★&nbsp;&nbsp;</span>
+                    <span aria-hidden="true">ВЫБЕРИ НОМЕР&nbsp;&nbsp;★&nbsp;&nbsp;ВПИШИ ИМЯ&nbsp;&nbsp;★&nbsp;&nbsp;КРУТИ БАРАБАН&nbsp;&nbsp;★&nbsp;&nbsp;ЖДИ РОЗЫГРЫША&nbsp;&nbsp;★&nbsp;&nbsp;УСАТЫЙ ЖЕЛАЕТ УДАЧИ&nbsp;&nbsp;★&nbsp;&nbsp;</span>
                 </div>
             </div>
 
@@ -579,12 +582,12 @@ function Fortune(props) {
                         <div className="modal__kicker">заявка на номер</div>
                         <div className="coin">{modalCtx.n}</div>
                         <label className="field">
-                            <span>ФИО участника</span>
+                            <span>Имя участника</span>
                             <input maxLength="60" placeholder="Иванов Иван Иванович"
                                 value={claimName} onChange={(e) => setClaimName(e.target.value)}
                                 autoFocus autoComplete="name" />
                         </label>
-                        <p className="hint">Ваше ФИО будет видно всем в списке участников.</p>
+                        <p className="hint">Ваше имя будет видно всем в списке участников.</p>
                         <div className="modal__row">
                             <button type="button" className="btn" onClick={() => setActiveModal(null)}>Отмена</button>
                             <button type="submit" className="btn btn--red">Занять номер</button>
