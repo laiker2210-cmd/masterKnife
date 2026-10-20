@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './Fortune.css';
 import { loadFortune, saveFortune } from '../../lib/contentApi';
+import { supabase } from '../../lib/supabaseClient';
 
 const CONFIG = {
     MAX_NUMBER: Math.min(100, Math.max(2, 30)),
-    OWNER_PIN: process.env.REACT_APP_OWNER_PIN,
     POLL_MS: 8000,
 };
 
@@ -167,18 +167,33 @@ function Fortune(props) {
         });
     };
 
-    const handlePinOk = () => {
-        if (pinInput === CONFIG.OWNER_PIN) {
-            sessionStorage.setItem('lb_owner', '1');
-            setIsOwner(true);
-            setActiveModal(null);
-            toast('Режим ведущего включён', 'ok');
-            if (window.__pinResolver) {
-                window.__pinResolver(true);
-                window.__pinResolver = null;
+    const handlePinOk = async () => {
+        if (!pinInput.trim()) {
+            toast('Введите PIN', 'warn');
+            return;
+        }
+        try {
+            const { data, error } = await supabase.functions.invoke('verify-pin', {
+                body: { pin: pinInput.trim() },
+            });
+            if (error) {
+                toast('Ошибка проверки PIN', 'err');
+                return;
             }
-        } else {
-            toast('Неверный пароль', 'err');
+            if (data.verified) {
+                sessionStorage.setItem('lb_owner', '1');
+                setIsOwner(true);
+                setActiveModal(null);
+                toast('Режим ведущего включён', 'ok');
+                if (window.__pinResolver) {
+                    window.__pinResolver(true);
+                    window.__pinResolver = null;
+                }
+            } else {
+                toast('Неверный пароль', 'err');
+            }
+        } catch {
+            toast('Ошибка проверки PIN', 'err');
         }
     };
 
