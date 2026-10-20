@@ -76,6 +76,10 @@ h1 {
     overflow: hidden;
 }
 
+.dev-watermark.hidden {
+    display: none;
+}
+
 .dev-watermark span {
     transform: rotate(-45deg);
     font-size: clamp(36px, 7vw, 100px);

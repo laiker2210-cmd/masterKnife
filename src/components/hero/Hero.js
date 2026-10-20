@@ -1,7 +1,7 @@
 import logo from './headerImg.jpeg';
 import './Hero.css';
 
-function Hero() {
+function Hero({ hidden = false }) {
     const scrollToCatalog = () => {
         document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -15,11 +15,9 @@ function Hero() {
                     Смотреть каталог
                 </button>
             </div>
-            {process.env.NODE_ENV === 'development' && (
-                <div className="dev-watermark" aria-hidden="true">
-                    <span>САЙТ В РАЗРАБОТКЕ</span>
-                </div>
-            )}
+            <div className={`dev-watermark ${hidden ? 'hidden' : ''}`} aria-hidden={hidden}>
+                <span>САЙТ В РАЗРАБОТКЕ</span>
+            </div>
         </section>
     );
 }

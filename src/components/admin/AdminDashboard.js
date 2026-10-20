@@ -16,6 +16,7 @@ function AdminDashboard() {
     const [tab, setTab] = useState('knives');
     const [status, setStatus] = useState('Загрузка…');
     const [loading, setLoading] = useState(true);
+    const [settings, setSettings] = useState({ watermark: true });
     const contentRef = useRef(localContent); // зеркало актуального контента
 
     useEffect(() => {
@@ -28,6 +29,7 @@ function AdminDashboard() {
                         reviews: remote.reviews?.length ? remote.reviews : reviews,
                         gallery: remote.gallery?.length ? remote.gallery : galleryImages,
                     };
+                    setSettings({ watermark: remote.watermark !== false });
                     contentRef.current = next;
                     setContent(next);
                     setStatus('Данные загружены из базы');
@@ -49,6 +51,18 @@ function AdminDashboard() {
         try {
             await saveContent(next);
             setStatus('Сохранено ✓ ' + new Date().toLocaleTimeString());
+        } catch {
+            setStatus('Ошибка сохранения ✗');
+        }
+    };
+
+    const handleWatermarkToggle = async () => {
+        const next = { ...contentRef.current, watermark: !settings.watermark };
+        contentRef.current = next;
+        setSettings({ watermark: next.watermark });
+        try {
+            await saveContent(next);
+            setStatus('Настройки сохранены ✓ ' + new Date().toLocaleTimeString());
         } catch {
             setStatus('Ошибка сохранения ✗');
         }
@@ -81,17 +95,36 @@ function AdminDashboard() {
                         {s.title}
                     </button>
                 ))}
+                <button key="settings" className={tab === 'settings' ? 'active' : ''} onClick={() => setTab('settings')}>
+                    ⚙️ Настройки
+                </button>
                 <button className="btn" onClick={handleBackup} style={{ marginLeft: 'auto' }}>💾 Резервная копия</button>
             </div>
             <p className="admin-status">{status}</p>
             {loading ? (
                 <p>Загрузка данных…</p>
             ) : (
-                <CollectionEditor
-                    schema={collections[tab]}
-                    items={content[tab]}
-                    onChange={(list) => update(tab, list)}
-                />
+                <>
+                    {tab === 'settings' ? (
+                        <div className="settings-panel">
+                            <h3>Настройки сайта</h3>
+                            <label className="toggle-row">
+                                <input
+                                    type="checkbox"
+                                    checked={settings.watermark}
+                                    onChange={handleWatermarkToggle}
+                                />
+                                <span>Показывать водяной знак «САЙТ В РАЗРАБОТКЕ»</span>
+                            </label>
+                        </div>
+                    ) : (
+                        <CollectionEditor
+                            schema={collections[tab]}
+                            items={content[tab]}
+                            onChange={(list) => update(tab, list)}
+                        />
+                    )}
+                </>
             )}
         </div>
     );

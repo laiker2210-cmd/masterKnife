@@ -26,6 +26,7 @@ function MainLayout() {
         knives: localKnives,
         reviews: localReviews,
         gallery: localGallery,
+        watermark: true,
     });
 
     useEffect(() => {
@@ -43,6 +44,7 @@ function MainLayout() {
                         knives: parsed.knives?.length ? parsed.knives : localKnives,
                         reviews: parsed.reviews?.length ? parsed.reviews : localReviews,
                         gallery: parsed.gallery?.length ? parsed.gallery : localGallery,
+                        watermark: parsed.watermark !== false,
                     });
                     setLoading(false);
                 }
@@ -58,12 +60,14 @@ function MainLayout() {
                         knives: remote.knives?.length ? remote.knives : localKnives,
                         reviews: remote.reviews?.length ? remote.reviews : localReviews,
                         gallery: remote.gallery?.length ? remote.gallery : localGallery,
+                        watermark: remote.watermark !== false,
                         _ts: Date.now(),
                     };
                     setContent({
                         knives: fresh.knives,
                         reviews: fresh.reviews,
                         gallery: fresh.gallery,
+                        watermark: fresh.watermark,
                     });
                     try { localStorage.setItem(CACHE_KEY, JSON.stringify(fresh)); } catch { }
                 }
@@ -86,7 +90,7 @@ function MainLayout() {
         <>
             <Nav links={NavLinks} onContact={() => openContact()} onFortune={() => navigate('/fortune')} />
             <main id="main-content">
-                <Hero />
+                <Hero hidden={!content.watermark} />
                 {loading ? (
                     <Skeleton />
                 ) : (
