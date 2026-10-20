@@ -22,8 +22,8 @@ function Nav(props) {
                 </button>
 
                 <ul className={`nav-list ${isOpen ? 'nav-list--open' : ''}`}>
-                    {links.map(link => (
-                        <li key={link.href}>
+                    {links.map((link, index) => (
+                        <li key={link.label || index}>
                             <a href={link.href} onClick={closeMenu}>{link.label}</a>
                         </li>
                     ))}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Nav from '../nav/Nav';
 import Hero from '../hero/Hero';
 import Catalog from '../catalog/Catalog';
@@ -8,7 +9,6 @@ import Reviews from '../reviews/Reviews';
 import Contacts from '../contacts/Contacts';
 import Footer from '../footer/Footer';
 import ContactModal from '../contactModal/ContactModal';
-import Fortune from '../fortune/Fortune';
 import ScrollTop from '../scrolltop/ScrollTop';
 import { NavLinks } from '../../data/NavLinks';
 import { knives as localKnives } from '../../data/knives';
@@ -18,9 +18,9 @@ import { loadContent } from '../../lib/contentApi';
 import './MainLayout.css';
 
 function MainLayout() {
+    const navigate = useNavigate();
     const [contactOpen, setContactOpen] = useState(false);
     const [contactKnife, setContactKnife] = useState(null);
-    const [page, setPage] = useState('home');
     const [loading, setLoading] = useState(true);
     const [content, setContent] = useState({
         knives: localKnives,
@@ -31,24 +31,24 @@ function MainLayout() {
     useEffect(() => {
         let cancelled = false;
         const CACHE_KEY = 'site_content_v1';
+        const CACHE_TTL = 5 * 60 * 1000; // 5 минут
 
-        // 1. Мгновенно показываем кеш из sessionStorage, если есть
         try {
-            const cached = sessionStorage.getItem(CACHE_KEY);
+            const cached = localStorage.getItem(CACHE_KEY);
             if (cached) {
                 const parsed = JSON.parse(cached);
-                if (parsed.knives?.length || parsed.reviews?.length || parsed.gallery?.length) {
+                const isFresh = Date.now() - (parsed._ts || 0) < CACHE_TTL;
+                if (isFresh && (parsed.knives?.length || parsed.reviews?.length || parsed.gallery?.length)) {
                     setContent({
                         knives: parsed.knives?.length ? parsed.knives : localKnives,
                         reviews: parsed.reviews?.length ? parsed.reviews : localReviews,
                         gallery: parsed.gallery?.length ? parsed.gallery : localGallery,
                     });
-                    setLoading(false); // не показываем скелетон, есть кеш
+                    setLoading(false);
                 }
             }
         } catch { /* поврежденный кеш — игнорируем */ }
 
-        // 2. Параллельно тянем свежие данные
         (async () => {
             try {
                 const remote = await loadContent();
@@ -58,12 +58,17 @@ function MainLayout() {
                         knives: remote.knives?.length ? remote.knives : localKnives,
                         reviews: remote.reviews?.length ? remote.reviews : localReviews,
                         gallery: remote.gallery?.length ? remote.gallery : localGallery,
+                        _ts: Date.now(),
                     };
-                    setContent(fresh);
-                    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(remote)); } catch { }
+                    setContent({
+                        knives: fresh.knives,
+                        reviews: fresh.reviews,
+                        gallery: fresh.gallery,
+                    });
+                    try { localStorage.setItem(CACHE_KEY, JSON.stringify(fresh)); } catch { }
                 }
             } catch {
-                // база недоступна — если кеша нет, loading уже false и показаны локальные
+                // база недоступна
             } finally {
                 if (!cancelled) setLoading(false);
             }
@@ -77,14 +82,10 @@ function MainLayout() {
         setContactOpen(true);
     };
 
-    if (page === 'fortune') {
-        return <Fortune onBack={() => setPage('home')} />;
-    }
-
     return (
         <>
-            <Nav links={NavLinks} onContact={() => openContact()} onFortune={() => setPage('fortune')} />
-            <main>
+            <Nav links={NavLinks} onContact={() => openContact()} onFortune={() => navigate('/fortune')} />
+            <main id="main-content">
                 <Hero />
                 {loading ? (
                     <Skeleton />

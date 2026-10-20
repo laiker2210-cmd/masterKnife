@@ -20,7 +20,9 @@
 .env.test.local
 .env.production.local
 .gigacode_vsc/
+gigacode.json
 .gigacode.json
+*gigacode*
 
 npm-debug.log*
 yarn-debug.log*

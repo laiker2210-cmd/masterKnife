@@ -1,4 +1,5 @@
 import './About.css';
+import { resolveImage } from '../../lib/resolveImage';
 
 function About() {
     return (
@@ -8,9 +9,10 @@ function About() {
 
                 <div className="about__block about__block--left">
                     <img
-                        src={process.env.PUBLIC_URL + "/images/about/forge.jpg"} 
+                        src={resolveImage("/images/about/forge.jpg")} 
                         alt="Нож на подставке"
                         className="about__image"
+                        loading="lazy"
                     />
                     <p>
                         Мы работаем с проверенными кузнецами и заказываем материалы
@@ -22,9 +24,10 @@ function About() {
 
                 <div className="about__block about__block--right">
                     <img
-                        src={process.env.PUBLIC_URL + "/images/about/forge3.jpg"}
+                        src={resolveImage("/images/about/forge3.jpg")}
                         alt="Нож на подставке"
                         className="about__image"
+                        loading="lazy"
                     />
                     <p>
                         Рукоять, больстер, клинок — всё подбирается индивидуально.

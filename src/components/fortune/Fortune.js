@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './Fortune.css';
-
-/* ============ SUPABASE CONFIG ============ */
-const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
-const SUPABASE_KEY = process.env.REACT_APP_SUPABASE_KEY;
-const TABLE_NAME = 'fortune_data';
-/* ========================================= */
+import { loadFortune, saveFortune } from '../../lib/contentApi';
 
 const CONFIG = {
     MAX_NUMBER: Math.min(100, Math.max(2, 30)),
@@ -19,29 +14,6 @@ function norm(d) {
     d.draws = d.draws || [];
     d.max = Math.min(100, Math.max(2, +d.max || CONFIG.MAX_NUMBER));
     return d;
-}
-
-async function load() {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.1`, {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const rows = await r.json();
-    return norm(rows[0]?.data || {});
-}
-
-async function save(data) {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?id=eq.1`, {
-        method: 'PATCH',
-        headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ data })
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
 }
 
 /* ============ КОНФЕТТИ (canvas) ============ */
@@ -120,7 +92,7 @@ function Fortune(props) {
     /* ---- обновление данных ---- */
     const refresh = useCallback(async () => {
         try {
-            const d = await load();
+            const d = norm(await loadFortune());
             setData(d);
             setLastSync(Date.now());
             setSyncOk(true);
@@ -234,12 +206,12 @@ function Fortune(props) {
         const v = Math.floor(+maxInput);
         if (!(v >= 2 && v <= 100)) return toast('Введите число от 2 до 100', 'warn');
         try {
-            const fresh = await load();
+            const fresh = norm(await loadFortune());
             const takenKeys = Object.keys(fresh.entries).map(Number);
             const maxTaken = takenKeys.length ? Math.max(...takenKeys) : 0;
             if (v < maxTaken) return toast(`Сначала освободите номера выше ${v} (сейчас занят до ${maxTaken})`, 'warn');
             fresh.max = v;
-            await save(fresh);
+            await saveFortune(fresh);
             setData(fresh);
             setLastSync(Date.now());
             toast(`Теперь номеров: ${v}`, 'ok');
@@ -249,10 +221,10 @@ function Fortune(props) {
     const handleReset = async () => {
         if (!window.confirm('Освободить ВСЕ номера? Действие необратимо.')) return;
         try {
-            const fresh = await load();
+            const fresh = norm(await loadFortune());
             fresh.entries = {};
             fresh.draws = [];
-            await save(fresh);
+            await saveFortune(fresh);
             setData(fresh);
             setLastSync(Date.now());
             toast('Все номера освобождены', 'ok');
@@ -280,7 +252,7 @@ function Fortune(props) {
         }
         const name = clean;
         try {
-            const fresh = await load();
+            const fresh = norm(await loadFortune());
             if (fresh.entries[modalCtx.n]) {
                 toast(`Увы! Номер ${modalCtx.n} уже успели занять`, 'warn');
                 setData(fresh);
@@ -289,7 +261,7 @@ function Fortune(props) {
                 return;
             }
             fresh.entries[modalCtx.n] = { name, ts: Date.now() };
-            await save(fresh);
+            await saveFortune(fresh);
             setData(fresh);
             setLastSync(Date.now());
             setActiveModal(null);
@@ -307,9 +279,9 @@ function Fortune(props) {
         }
         if (!window.confirm(`Освободить номер ${modalCtx.n}?`)) return;
         try {
-            const fresh = await load();
+            const fresh = norm(await loadFortune());
             delete fresh.entries[modalCtx.n];
-            await save(fresh);
+            await saveFortune(fresh);
             setData(fresh);
             setLastSync(Date.now());
             setActiveModal(null);
@@ -380,7 +352,7 @@ function Fortune(props) {
 
         // FIX: свежий снимок из базы - заявки, пришедшие во время крутки, не затираются
         try {
-            const fresh = await load();
+            const fresh = norm(await loadFortune());
             fresh.draws = [...(fresh.draws || [])];
             fresh.draws.push({
                 ts: Date.now(),
@@ -389,7 +361,7 @@ function Fortune(props) {
                 n: final,
                 name: fresh.entries[final]?.name || winnerName,
             });
-            await save(fresh);
+            await saveFortune(fresh);
             setData(fresh);
             setLastSync(Date.now());
         } catch {

@@ -4,7 +4,9 @@
 
 body {
   margin: 0;
-
+  font-family: 'Unbounded', 'Segoe UI', 'Golos Text', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html {
@@ -16,4 +18,22 @@ html {
   margin: 0 auto;
   padding-left: 16px;
   padding-right: 16px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  padding: 12px 24px;
+  background: #ffcc33;
+  color: #000000;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 0 0 8px 8px;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
 }

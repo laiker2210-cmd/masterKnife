@@ -13,8 +13,8 @@ function Footer() {
 
                 <nav className="footer__nav">
                     <ul>
-                        {NavLinks.map(link => (
-                            <li key={link.href}>
+                        {NavLinks.map((link, index) => (
+                            <li key={link.label || index}>
                                 <a href={link.href}>{link.label}</a>
                             </li>
                         ))}

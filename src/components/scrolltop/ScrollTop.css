@@ -23,11 +23,3 @@
     visibility: visible;
     transform: translateY(0);
 }
-
-/*кнопка ТОЛЬКО на мобильных, если нужно, но хз, лучше пусть будет, чем потом забыть ху ес ху
-@media (min-width: 769px) {
-    .scroll-top {
-        display: none;
-    }
-}
-*/

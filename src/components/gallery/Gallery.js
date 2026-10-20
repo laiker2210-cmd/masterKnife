@@ -42,7 +42,7 @@ function Gallery(props) {
 
             {selected && (
                 <Modal wide onClose={() => setSelected(null)}>
-                    <img className="gallery__full" src={selected.src} alt={selected.alt} />
+                    <img className="gallery__full" src={resolveImage(selected.src)} alt={selected.alt} />
                 </Modal>
             )}
         </section>
