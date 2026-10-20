@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './Fortune.css';
 import { loadFortune, saveFortune } from '../../lib/contentApi';
-import { supabase } from '../../lib/supabaseClient';
 
 const CONFIG = {
     MAX_NUMBER: Math.min(100, Math.max(2, 30)),
     POLL_MS: 8000,
 };
+
+const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL || '';
+const VERIFY_PIN_URL = `${SUPABASE_URL}/functions/v1/verify-pin`;
 
 function norm(d) {
     if (!d || typeof d !== 'object' || Array.isArray(d)) d = {};
@@ -173,14 +175,17 @@ function Fortune(props) {
             return;
         }
         try {
-            const { data, error } = await supabase.functions.invoke('verify-pin', {
-                body: { pin: pinInput.trim() },
+            const res = await fetch(VERIFY_PIN_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin: pinInput.trim() }),
             });
-            if (error) {
-                toast('Ошибка проверки PIN', 'err');
+            if (!res.ok) {
+                toast('Ошибка сервера', 'err');
                 return;
             }
-            if (data.verified) {
+            const result = await res.json();
+            if (result.verified) {
                 sessionStorage.setItem('lb_owner', '1');
                 setIsOwner(true);
                 setActiveModal(null);
